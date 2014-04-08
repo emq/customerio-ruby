@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe Customerio::Client do
-	let(:client)   { Customerio::Client.new("SITE_ID", "API_KEY") }
+	let(:client)   { Customerio::Client.new("SITE_ID", "API_KEY", options) }
   let(:response) { mock("Response", :code => 200) }
+  let(:options)  { {} }
 
   before do
     # Dont call out to customer.io
@@ -20,16 +21,6 @@ describe Customerio::Client do
     it "sends a PUT request to customer.io's customer API" do
       Customerio::Client.should_receive(:put).with("/api/v1/customers/5", anything()).and_return(response)
       client.identify(:id => 5)
-    end
-
-    it "sends a PUT request to customer.io's customer API using json headers" do
-      client = Customerio::Client.new("SITE_ID", "API_KEY", :json => true)
-      Customerio::Client.should_receive(:put).with(
-        "/api/v1/customers/5",
-        {:basic_auth=>{:username=>"SITE_ID", :password=>"API_KEY"},
-          :body=>"{\"id\":5,\"name\":\"Bob\"}",
-          :headers=>{"Content-Type"=>"application/json"}}).and_return(response)
-      client.identify(:id => 5, :name => "Bob")
     end
 
     it "raises an error if PUT doesn't return a 2xx response code" do
@@ -63,6 +54,19 @@ describe Customerio::Client do
 
     it "requires an id attribute" do
       lambda { client.identify(:email => "customer@example.com") }.should raise_error(Customerio::Client::MissingIdAttributeError)
+    end
+
+    context "with json option enabled" do
+      let(:options){ { :json => true} }
+
+      it "sends a PUT request to customer.io's customer API using json headers" do
+        Customerio::Client.should_receive(:put).with(
+          "/api/v1/customers/5",
+          {:basic_auth=>{:username=>"SITE_ID", :password=>"API_KEY"},
+            :body=>"{\"id\":5,\"name\":\"Bob\"}",
+            :headers=>{"Content-Type"=>"application/json"}}).and_return(response)
+        client.identify(:id => 5, :name => "Bob")
+      end
     end
   end
 
