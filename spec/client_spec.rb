@@ -218,5 +218,19 @@ describe Customerio::Client do
         client.track("purchase", :type => "socks", :price => "13.99", :timestamp => 1561231234)
       end
     end
+
+    context "with json option enabled" do
+      let(:options){ { :json => true} }
+
+      it "sends a POST request to the customer.io's event API using json headers" do
+        Customerio::Client.should_receive(:post).with("/api/v1/customers/5/events", {
+          :basic_auth => anything(),
+          :headers => {"Content-Type"=>"application/json"},
+          :body=>"{\"name\":\"purchase\",\"data\":{\"type\":\"pro socks\",\"price\":\"99\"}}"
+        }).and_return(response)
+
+        client.track(5, "purchase", :type => "pro socks", :price => "99")
+      end
+    end
   end
 end

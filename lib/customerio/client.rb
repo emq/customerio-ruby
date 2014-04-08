@@ -45,11 +45,8 @@ module Customerio
 
       url = customer_path(attributes[:id])
 
-      if @json
-        verify_response(self.class.put(url, options.merge(:body => attributes.to_json, :headers => {'Content-Type' => 'application/json'})))
-      else
-        verify_response(self.class.put(url, options.merge(:body => attributes)))
-      end
+      attributes = attributes.to_json if @json
+      verify_response(self.class.put(url, options.merge(:body => attributes)))
     end
 
     def create_customer_event(customer_id, event_name, attributes = {})
@@ -63,6 +60,8 @@ module Customerio
     def create_event(url, event_name, attributes = {})
       body = { :name => event_name, :data => attributes }
       body[:timestamp] = attributes[:timestamp] if valid_timestamp?(attributes[:timestamp])
+      body = body.to_json if @json
+
       verify_response(self.class.post(url, options.merge(:body => body)))
     end
 
@@ -89,7 +88,11 @@ module Customerio
     end
 
     def options
-      { :basic_auth => @auth }
+      { :basic_auth => @auth }.merge(extra_params)
+    end
+
+    def extra_params
+      @json ? { :headers => {'Content-Type' => 'application/json'} } : {}
     end
   end
 end
