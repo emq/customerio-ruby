@@ -59,8 +59,9 @@ module Customerio
 
     def create_event(url, event_name, attributes = {})
       attributes = attributes.dup
-      body = { :name => event_name, :data => attributes }
+      body = { :name => event_name }
       body[:timestamp] = attributes.delete(:timestamp) if valid_timestamp?(attributes[:timestamp])
+      body[:data] = attributes
       body = body.to_json if @json
 
       verify_response(self.class.post(url, options.merge(:body => body)))
