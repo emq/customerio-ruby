@@ -123,7 +123,7 @@ describe Customerio::Client do
   			:basic_auth => anything(),
   			:body => {
   				:name => "purchase",
-  			  :data => { :type => "socks", :price => "13.99", :timestamp => 1561231234 },
+  			  :data => { :type => "socks", :price => "13.99" },
           :timestamp => 1561231234
   			}
   		}).and_return(response)
@@ -210,7 +210,7 @@ describe Customerio::Client do
           :basic_auth => anything(),
           :body => {
             :name => "purchase",
-  			    :data => { :type => "socks", :price => "13.99", :timestamp => 1561231234 },
+  			    :data => { :type => "socks", :price => "13.99"},
             :timestamp => 1561231234
           }
         }).and_return(response)
